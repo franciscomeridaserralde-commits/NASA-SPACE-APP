@@ -9,8 +9,6 @@ import io
 import warnings
 warnings.filterwarnings("ignore")
 
-urls = []
-
 def get_time_series(start_date,end_date,latitude,longitude,variable):
     base_url = "https://hydro1.gesdisc.eosdis.nasa.gov/daac-bin/access/timeseries.cgi"
     query_parameters = {
@@ -23,7 +21,6 @@ def get_time_series(start_date,end_date,latitude,longitude,variable):
     full_url = base_url+"?"+ \
          "&".join(["{}={}".format(key,urlp.quote(query_parameters[key])) for key in query_parameters])
     print(full_url)
-    urls.append(full_url)
     iteration = 0
     done = False
     while not done and iteration < 5:
@@ -94,7 +91,7 @@ df_evap = parse_time_series(
                 end_date="2023-07-01T00",
                 latitude=38.89,
                 longitude=-88.18,
-                variable="GLDAS2:GLDAS_NOAH025_3H_v2.1:Evap_tavg"
+                variable="NLDAS2:NLDAS_FORA0125_H_v2.0:PotEvap"
                 )
             )
 
@@ -117,7 +114,7 @@ d = {'time': pd.to_datetime(df_precip[1]['time'], unit='s'),
     'SoilM_0_100cm': df_soil[1]['data'],
     'SWdown': df_RadWave[1]['data'],
     'Tair': df_temp[1]['data'],
-    'Evap_tavg': df_evap[1]['data']}
+    'PotEvap': df_evap[1]['data']}
     
 df = pd.DataFrame(data=d)
 df.head()
@@ -134,9 +131,9 @@ columna_filtrado3 = filtrado['SWdown']
 promSWdown = columna_filtrado3.mean()
 columna_filtrado4 = filtrado['Tair']
 promTemp = columna_filtrado4.mean()
-columna_filtrado5 = filtrado['Evap_tavg']
+columna_filtrado5 = filtrado['PotEvap']
 promEvap = columna_filtrado5.mean()
-print("El promedio de evapotranspiracion es:", promEvap)
+print("El promedio de evaporacion potencial es:", promEvap)
 print("El promedio de temperatura es:", promTemp)
 print("El promedio de radiacion solar de onda corta es:", promSWdown)
 print("El promedio de precipitacion es:", promRainf)
