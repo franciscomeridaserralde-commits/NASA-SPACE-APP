@@ -52,6 +52,9 @@ def parse_time_series(ts_str):
     return parameters, df
 
 
+def Temp(T):
+    return (T - 32) * 5.0/9.0
+
 latitude = 38.89
 longitude = -88.93
 
@@ -107,6 +110,7 @@ df_temp = parse_time_series(
 
 month = int(input("Ingrese el mes (1-12): "))
 day = int(input("Ingrese el día (1-31): "))
+hour = int(input("Ingrese la hora (0-23): "))
 
 df_soil[1]['data']
 d = {'time': pd.to_datetime(df_precip[1]['time'], unit='s'), 
@@ -120,7 +124,7 @@ df = pd.DataFrame(data=d)
 df.head()
 df.to_csv('extracr.csv', index=False)
 time.sleep(5)
-ids_comunes = [f"{year}-{month:02d}-{day:02d} 00:00:00" for year in range(2018, 2024)]
+ids_comunes = [f"{year}-{month:02d}-{day:02d} {hour:02d}:00:00" for year in range(2018, 2024)]
 filtrado = df[df['time'].isin(ids_comunes)]
 print(filtrado)
 columna_filtrado = filtrado['Rainf']
@@ -138,3 +142,11 @@ print("El promedio de temperatura es:", promTemp)
 print("El promedio de radiacion solar de onda corta es:", promSWdown)
 print("El promedio de precipitacion es:", promRainf)
 print("El promedio de humedad es:", promSoilM)
+
+# =============================================
+# BLOQUE PARA ESTIMAR PORCENTAJE DE LLUVIA
+# =============================================
+rain_occurrences = (filtrado['Rainf'] > 0).sum()  
+total_years = len(filtrado)
+rain_probability = (rain_occurrences / total_years) * 100 if total_years > 0 else 0
+print(f"Probabilidad histórica de lluvia en {month:02d}-{day:02d} (a las {hour:02d}:00): {rain_probability:.1f}%")
