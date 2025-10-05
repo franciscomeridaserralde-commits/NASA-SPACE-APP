@@ -92,8 +92,8 @@ df_evap = parse_time_series(
             get_time_series(
                 start_date="2017-07-01T00", 
                 end_date="2023-07-01T00",
-                latitude=38.89,
-                longitude=-88.18,
+                latitude=latitude,
+                longitude=longitude,
                 variable="NLDAS2:NLDAS_FORA0125_H_v2.0:PotEvap"
                 )
             )
@@ -149,4 +149,5 @@ print("El promedio de humedad es:", promSoilM)
 rain_occurrences = (filtrado['Rainf'] > 0).sum()  
 total_years = len(filtrado)
 rain_probability = (rain_occurrences / total_years) * 100 if total_years > 0 else 0
+
 print(f"Probabilidad histórica de lluvia en {month:02d}-{day:02d} (a las {hour:02d}:00): {rain_probability:.1f}%")
