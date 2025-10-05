@@ -54,44 +54,90 @@ def parse_time_series(ts_str):
                        header=10,parse_dates=["time"])
     return parameters, df
 
+
+latitude = 38.89
+longitude = -88.93
+
 df_precip = parse_time_series(
             get_time_series(
-                start_date="2017-07-01T00", 
-                end_date="2023-07-01T00",
-                latitude=38.89,
-                longitude=-88.18,
+                start_date="2017-01-01T00", 
+                end_date="2023-12-01T23",
+                latitude=latitude,
+                longitude=longitude,
                 variable="NLDAS2:NLDAS_FORA0125_H_v2.0:Rainf"
+            )
+        )
+
+df_RadWave = parse_time_series(
+            get_time_series(
+                start_date="2017-01-01T00", 
+                end_date="2023-12-01T23",
+                latitude=latitude,
+                longitude=longitude,
+                variable="NLDAS2:NLDAS_FORA0125_H_v2.0:SWdown"
             )
         )
 
 df_soil = parse_time_series(
             get_time_series(
-                start_date="2017-07-01T00", 
-                end_date="2023-07-01T00",
-                latitude=38.89,
-                longitude=-88.18,
+                start_date="2017-01-01T00", 
+                end_date="2023-12-01T23",
+                latitude=latitude,
+                longitude=longitude,
                 variable="NLDAS2:NLDAS_NOAH0125_H_v2.0:SoilM_0_100cm"
           )
         )
 
+df_evap = parse_time_series(
+            get_time_series(
+                start_date="2017-07-01T00", 
+                end_date="2023-07-01T00",
+                latitude=38.89,
+                longitude=-88.18,
+                variable="GLDAS2:GLDAS_NOAH025_3H_v2.1:Evap_tavg"
+                )
+            )
+
+df_temp = parse_time_series(
+            get_time_series(
+                start_date="2017-01-01T00", 
+                end_date="2023-12-01T23",
+                latitude=latitude,
+                longitude=longitude,
+                variable="NLDAS2:NLDAS_FORA0125_H_v2.0:Tair"
+          )
+        )
+
+month = int(input("Ingrese el mes (1-12): "))
+day = int(input("Ingrese el día (1-31): "))
+
 df_soil[1]['data']
 d = {'time': pd.to_datetime(df_precip[1]['time'], unit='s'), 
     'Rainf': df_precip[1]['data'], 
-    'SoilM_0_100cm': df_soil[1]['data']}
+    'SoilM_0_100cm': df_soil[1]['data'],
+    'SWdown': df_RadWave[1]['data'],
+    'Tair': df_temp[1]['data'],
+    'Evap_tavg': df_evap[1]['data']}
     
 df = pd.DataFrame(data=d)
 df.head()
 df.to_csv('extracr.csv', index=False)
 time.sleep(5)
-month = int(input("Ingrese el mes (1-12): "))
-day = int(input("Ingrese el día (1-31): "))
 ids_comunes = [f"{year}-{month:02d}-{day:02d} 00:00:00" for year in range(2018, 2024)]
-ids_comunes = ['2018-07-01 00:00:00','2019-07-01  00:00:00','2020-07-01 00:00:00', '2021-07-01 00:00:00','2022-07-01 00:00:00','2023-07-01 00:00:00']
 filtrado = df[df['time'].isin(ids_comunes)]
 print(filtrado)
 columna_filtrado = filtrado['Rainf']
 promRainf = columna_filtrado.mean()
 columna_filtrado2 = filtrado['SoilM_0_100cm']
 promSoilM = columna_filtrado2.mean()
+columna_filtrado3 = filtrado['SWdown']
+promSWdown = columna_filtrado3.mean()
+columna_filtrado4 = filtrado['Tair']
+promTemp = columna_filtrado4.mean()
+columna_filtrado5 = filtrado['Evap_tavg']
+promEvap = columna_filtrado5.mean()
+print("El promedio de evapotranspiracion es:", promEvap)
+print("El promedio de temperatura es:", promTemp)
+print("El promedio de radiacion solar de onda corta es:", promSWdown)
 print("El promedio de precipitacion es:", promRainf)
 print("El promedio de humedad es:", promSoilM)
